@@ -1,4 +1,4 @@
-name: Deploy to AWS S3
+name: Deploy Static Website to AWS S3
 
 on:
   push:
@@ -11,23 +11,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      # Step 1: Checkout your repository code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 🔍 CHANGED: Look inside the subfolder!
+      # Step 2: Validate HTML file exists in root
       - name: Validate HTML file exists
         run: |
-          echo "Checking files in subfolder..."
-          test -f my-devops-site/index.html && echo "index.html found ✅" || exit 1
+          echo "🔍 Checking repository root directory..."
+          ls -la
+          if [ -f "index.html" ]; then
+            echo "✅ index.html exists in root!"
+          else
+            echo "❌ ERROR: index.html not found in root folder."
+            echo "Run 'mv my-devops-site/index.html .' locally and push again."
+            exit 1
+          fi
 
+      # Step 3: Configure AWS Credentials from GitHub Secrets
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1
+          aws-region: us-east-1
 
-      # 🚀 CHANGED: Sync contents of my-devops-site folder to S3 root
-      - name: Deploy to S3
+      # Step 4: Sync static files to AWS S3 bucket
+      - name: Deploy to S3 Bucket
         run: |
-          aws s3 sync my-devops-site/ s3://${{ secrets.AWS_S3_BUCKET }} --delete
+          echo "🚀 Uploading files to S3 bucket..."
+          aws s3 sync . s3://${{ secrets.AWS_S3_BUCKET }} \
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --delete
+          echo "🎉 Deployment successful!"
