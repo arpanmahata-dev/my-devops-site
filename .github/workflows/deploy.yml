@@ -11,37 +11,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout your repository code
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Validate HTML file exists in root
       - name: Validate HTML file exists
         run: |
-          echo "🔍 Checking repository root directory..."
-          ls -la
-          if [ -f "index.html" ]; then
-            echo "✅ index.html exists in root!"
-          else
-            echo "❌ ERROR: index.html not found in root folder."
-            echo "Run 'mv my-devops-site/index.html .' locally and push again."
-            exit 1
-          fi
+          echo "🔍 Checking for index.html..."
+          test -f index.html && echo "✅ index.html found" || exit 1
 
-      # Step 3: Configure AWS Credentials from GitHub Secrets
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: ap-south-1                 # 👈 MATCHED TO YOUR BUCKET REGION!
 
-      # Step 4: Sync static files to AWS S3 bucket
       - name: Deploy to S3 Bucket
         run: |
-          echo "🚀 Uploading files to S3 bucket..."
           aws s3 sync . s3://${{ secrets.AWS_S3_BUCKET }} \
             --exclude ".git/*" \
             --exclude ".github/*" \
             --delete
-          echo "🎉 Deployment successful!"
