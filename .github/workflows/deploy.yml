@@ -1,0 +1,43 @@
+# 🏷️ Name shown in GitHub Actions UI
+name: Deploy to AWS S3
+
+# ⚡ TRIGGER: Run this workflow on every push to main
+on:
+  push:
+    branches:
+      - main          # Only triggers on main branch pushes
+
+# 🔨 JOBS: Define what to do
+jobs:
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest    # Use a fresh Ubuntu virtual machine
+
+    steps:
+      # 📥 Step 1: Download your code into the VM
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 🧪 Step 2: Validate HTML (basic CI check)
+      - name: Validate HTML file exists
+        run: |
+          echo "✅ Checking files..."
+          ls -la
+          test -f index.html && echo "index.html found ✅" || exit 1
+
+      # 🔐 Step 3: Configure AWS credentials (from your GitHub Secrets)
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1          # ← Change to your bucket's region
+
+      # 🚀 Step 4: Sync files to S3 bucket
+      - name: Deploy to S3
+        run: |
+          aws s3 sync . s3://${{ secrets.AWS_S3_BUCKET }} \
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --delete
+          echo "🌐 Deployed! Check your S3 website URL."
