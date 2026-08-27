@@ -29,4 +29,4 @@ my-devops-site/
         └── deploy.yml          ← 🔄 Updated to build + push Docker image
 ```
 ## 🚀 Live URL
-https://your-bucket-name.s3-website-us-east-1.amazonaws.com
+http://first-devops-site.s3-website.ap-south-1.amazonaws.com/
