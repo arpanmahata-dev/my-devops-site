@@ -16,14 +16,17 @@ A static website deployed automatically using GitHub Actions and AWS S3.
 5. Website is live! 🎉
 
 ## 📁 Project Structure
-```
+
 my-devops-site/
-├── index.html              # Main website
-├── README.md               # This file
+│
+├── index.html                  ← Your website (from Project #1)
+├── Dockerfile                  ← 🆕 Defines the container
+├── .dockerignore               ← 🆕 Files to exclude from image
+├── nginx.conf                  ← 🆕 Optional: custom Nginx config
+│
 └── .github/
     └── workflows/
-        └── deploy.yml      # CI/CD workflow
-```
+        └── deploy.yml          ← 🔄 Updated to build + push Docker image
 
 ## 🚀 Live URL
 https://your-bucket-name.s3-website-us-east-1.amazonaws.com
